@@ -62,14 +62,11 @@ export const useGameState = (initialSize: number = 15): UseGameStateReturn => {
     setShowPath(false);
     setHintPath([]);
     startTimeRef.current = Date.now();
-
-    const path = findShortestPath(newMaze, start, end);
-    setHintPath(path);
   }, []);
 
   useEffect(() => {
     initializeGame(mazeSize);
-    setBestTimeState(getBestTime());
+    setBestTimeState(getBestTime(mazeSize));
   }, []);
 
   useEffect(() => {
@@ -108,26 +105,30 @@ export const useGameState = (initialSize: number = 15): UseGameStateReturn => {
         setIsPlaying(false);
         const finalTime = (Date.now() - startTimeRef.current) / 1000;
         setElapsedTime(finalTime);
-        setBestTime(finalTime);
-        setBestTimeState(getBestTime());
+        setBestTime(mazeSize, finalTime);
+        setBestTimeState(getBestTime(mazeSize));
       }
     }
-  }, [maze, playerPos, endPos, isComplete, isPlaying]);
+  }, [maze, playerPos, endPos, isComplete, isPlaying, mazeSize]);
 
   const setMazeSize = useCallback((size: number) => {
     setMazeSizeState(size);
+    setBestTimeState(getBestTime(size));
     initializeGame(size);
   }, [initializeGame]);
 
   const toggleHint = useCallback(() => {
-    if (!showPath && hintPath.length === 0 && maze.length > 0) {
+    if (!showPath && maze.length > 0) {
       const path = findShortestPath(maze, playerPos, endPos);
       setHintPath(path);
+    } else if (showPath) {
+      setHintPath([]);
     }
     setShowPath((prev) => !prev);
-  }, [showPath, hintPath, maze, playerPos, endPos]);
+  }, [showPath, maze, playerPos, endPos]);
 
   const resetGame = useCallback(() => {
+    setBestTimeState(getBestTime(mazeSize));
     initializeGame(mazeSize);
   }, [mazeSize, initializeGame]);
 

@@ -1,28 +1,42 @@
-const BEST_TIME_KEY = 'maze_escape_best_time';
+const BEST_TIME_KEY_PREFIX = 'maze_escape_best_time_';
 
-export const getBestTime = (): number | null => {
+export const getBestTime = (mazeSize: number): number | null => {
   try {
-    const stored = localStorage.getItem(BEST_TIME_KEY);
+    const key = `${BEST_TIME_KEY_PREFIX}${mazeSize}`;
+    const stored = localStorage.getItem(key);
     return stored ? parseFloat(stored) : null;
   } catch {
     return null;
   }
 };
 
-export const setBestTime = (time: number): void => {
+export const setBestTime = (mazeSize: number, time: number): void => {
   try {
-    const current = getBestTime();
+    const key = `${BEST_TIME_KEY_PREFIX}${mazeSize}`;
+    const current = getBestTime(mazeSize);
     if (current === null || time < current) {
-      localStorage.setItem(BEST_TIME_KEY, time.toString());
+      localStorage.setItem(key, time.toString());
     }
   } catch {
     // ignore
   }
 };
 
-export const clearBestTime = (): void => {
+export const clearBestTime = (mazeSize: number): void => {
   try {
-    localStorage.removeItem(BEST_TIME_KEY);
+    const key = `${BEST_TIME_KEY_PREFIX}${mazeSize}`;
+    localStorage.removeItem(key);
+  } catch {
+    // ignore
+  }
+};
+
+export const clearAllBestTimes = (): void => {
+  try {
+    for (let i = 10; i <= 30; i++) {
+      const key = `${BEST_TIME_KEY_PREFIX}${i}`;
+      localStorage.removeItem(key);
+    }
   } catch {
     // ignore
   }
